@@ -15,6 +15,10 @@ app.get('/iOS/Console', function (req, res) {
 });
 
 
+app.set('port', process.env.PORT || 8088);
+app.listen(app.get('port'));
+
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
