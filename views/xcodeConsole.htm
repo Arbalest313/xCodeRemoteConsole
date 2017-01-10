@@ -127,10 +127,12 @@
  
     function writeToScreen(message) { 
       var tr = document.createElement('tr');   
-
+      var pre = document.createElement('pre');
       var td1 = document.createElement('td');
-        var text1 = document.createTextNode(message);
-      td1.appendChild(text1);
+
+      var text1 = document.createTextNode(message);
+      pre.appendChild(text1)
+      td1.appendChild(pre);
       tr.appendChild(td1);
       output.appendChild(tr);
       footerElement.scrollIntoView(false);
