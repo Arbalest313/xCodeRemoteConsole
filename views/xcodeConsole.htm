@@ -1,7 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0025)http://172.16.24.71:8080/ -->
 <html lang="en">
-
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>TestNSlog[39888]</title>
@@ -40,7 +38,10 @@
         font-weight: bold;
     }
     </style>
-    <script type="text/javascript">
+    
+    <script src="http://lib.sinaapp.com/js/jquery/1.7.2/jquery.min.js"></script>
+
+    <script>
     var refreshDelay = 500;
     var footerElement = null;
 
@@ -49,32 +50,13 @@
         footerElement.innerHTML = "Last updated on " + now.toLocaleDateString() + " " + now.toLocaleTimeString();
     }
 
-    function refresh() {
-        var timeElement = document.getElementById("maxTime");
-        var maxTime = timeElement.getAttribute("data-value");
-        timeElement.parentNode.removeChild(timeElement);
 
-        var xmlhttp = new XMLHttpRequest();
-        xmlhttp.onreadystatechange = function() {
-            if (xmlhttp.readyState == 4) {
-                if (xmlhttp.status == 200) {
-                    var contentElement = document.getElementById("content");
-                    contentElement.innerHTML = contentElement.innerHTML + xmlhttp.responseText;
-                    updateTimestamp();
-                    setTimeout(refresh, refreshDelay);
-                } else {
-                    footerElement.innerHTML = "<span class=\"error\">Connection failed! Reload page to try again.</span>";
-                }
-            }
-        }
-        xmlhttp.open("GET", "/log?after=" + maxTime, true);
-        xmlhttp.send();
-    }
-    window.onload = function() {
+    $( window ).load(function() {
         footerElement = document.getElementById("footer");
         updateTimestamp();
-        setTimeout(refresh, refreshDelay);
-    }
+        init();
+    });
+
     var ipAddress = getUrlParameter('ip');
     var wsUri ="ws://" + ipAddress + ":9001"; 
     var output;  
@@ -102,7 +84,7 @@
  
     function onOpen(evt) { 
         writeToScreen("CONNECTED"); 
-        doSend("WebSocket rocks"); 
+        // doSend("WebSocket rocks"); 
     }  
  
     function onClose(evt) { 
@@ -110,14 +92,12 @@
     }  
  
     function onMessage(evt) { 
-        // writeToScreen('<tr style="color: dimgray;"><td> '+ evt.data+'</td></tr>'); 
-                writeToScreen( evt.data); 
+        writeToScreen(evt.data); 
 
-        // websocket.close(); 
     }  
  
     function onError(evt) { 
-        writeToScreen('<span style="color: red;">ERROR:</span> '+ evt.data); 
+        writeToScreen( evt.data); 
     }  
  
     function doSend(message) { 
@@ -129,15 +109,25 @@
       var tr = document.createElement('tr');   
       var pre = document.createElement('pre');
       var td1 = document.createElement('td');
-
       var text1 = document.createTextNode(message);
       pre.appendChild(text1)
       td1.appendChild(pre);
       tr.appendChild(td1);
+
+      var lowerM = message.toLowerCase()
+      if (lowerM.indexOf("code = 0") >= 0 || lowerM.indexOf("error") >= 0 || lowerM.indexOf("exception") >= 0) {
+        tr.style.background = "#E97E60"
+      } else if (lowerM.indexOf("warning") >= 0) {
+        tr.style.background = "#FACC9A"
+      } else if (lowerM.indexOf("-- responsedata: {") >= 0) {
+        tr.style.color = "#5BBB7B"
+      }
+      
       output.appendChild(tr);
       footerElement.scrollIntoView(false);
+      updateTimestamp();
+
     }  
-    window.addEventListener("load", init, false);  
 
     function getUrlParameter(sParam) {
           var sPageURL = decodeURIComponent(window.location.search.substring(1)),
